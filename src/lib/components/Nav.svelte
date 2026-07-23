@@ -12,7 +12,7 @@
 	const navItems: NavItem[] = [
 		{
 			label: 'Home',
-			href: "/"
+			href: "/website"
 		},
 		{
 			label: 'Code',
@@ -29,7 +29,7 @@
 		},
 		{
 			label: 'About',
-			href: '/about'
+			href: 'about'
 		}
 	];
 </script>
