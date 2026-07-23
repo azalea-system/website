@@ -12,7 +12,7 @@
 
 <svelte:head>
     <link rel="icon" href={favicon} />
-    <title>Azalea Media Server</title>
+    <title>Azalea Media Server - Free, Open Source Media Server</title>
 </svelte:head>
 
 <div class="flex min-h-screen flex-col">
