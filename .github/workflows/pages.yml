@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy SvelteKit to GitHub Pages
 
 on:
   push:
@@ -16,25 +16,43 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
-      - run: npm ci
-      - run: npm run build
+      - name: Install dependencies
+        run: npm install
 
-      - name: Upload artifact
+      - name: Build
+        run: npm run build
+
+      - name: Prepare Pages artifact
+        run: |
+          rm -rf pages_build
+          mkdir -p pages_build
+          if [ -d ".svelte-kit/output" ]; then
+            cp -R .svelte-kit/output/* pages_build/
+          elif [ -d ".svelte-kit" ]; then
+            # Fallback: copy everything from .svelte-kit (you may need to adjust)
+            cp -R .svelte-kit/* pages_build/ || true
+          else
+            echo "No SvelteKit static output directory found."
+            exit 1
+          fi
+
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .svelte-kit/
+          path: ./pages_build
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy
+      - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
