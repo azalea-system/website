@@ -20,35 +20,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 1. Install pnpm first
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      # 2. Setup Node and enable pnpm caching
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
+          cache: pnpm
 
+      # 3. Install packages using pnpm
       - name: Install dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
+      # 4. Build SvelteKit static app
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
-      - name: Prepare Pages artifact
-        run: |
-          rm -rf pages_build
-          mkdir -p pages_build
-          if [ -d ".svelte-kit/output" ]; then
-            cp -R .svelte-kit/output/* pages_build/
-          elif [ -d ".svelte-kit" ]; then
-            # Fallback: copy everything from .svelte-kit (you may need to adjust)
-            cp -R .svelte-kit/* pages_build/ || true
-          else
-            echo "No SvelteKit static output directory found."
-            exit 1
-          fi
-
+      # 5. Upload static output directory directly
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./pages_build
+          path: ./build
 
   deploy:
     needs: build
